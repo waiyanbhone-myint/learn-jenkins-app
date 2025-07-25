@@ -23,7 +23,11 @@ pipeline {
         stage('Test'){
             agent any
             steps{
-                sh'echo "Test Stage"'
+                echo "Test Stage"
+                sh'''
+                    pwd
+                    ls -la
+                '''
             }
         }
     }
