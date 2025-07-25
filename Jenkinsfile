@@ -26,7 +26,7 @@ pipeline {
                 echo "Test Stage"
                 sh'''
                     pwd
-                    ls -la
+                    ls -la build/
                 '''
             }
         }
