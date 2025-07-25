@@ -23,7 +23,7 @@ pipeline {
         stage('Test'){
             agent any
             steps{
-                echo 'Test Stage'
+                sh'echo "Test Stage"'
             }
         }
     }
