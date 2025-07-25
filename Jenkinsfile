@@ -27,6 +27,7 @@ pipeline {
                 sh'''
                     pwd
                     ls -la build/
+                    npm test
                 '''
             }
         }
