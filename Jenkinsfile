@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     stages {
-        stage('Build') {
+        /*stage('Build') {
             agent{
                 docker{
                     image 'node:18-alpine'
@@ -19,39 +19,43 @@ pipeline {
                     ls -la
                 '''
             }
-        }
-        stage('Test'){
-            agent{
-                docker {
-                    image 'node:18-alpine'
-                    reuseNode true
-                }
-            }
-            steps{
-                echo "Test Stage"
-                sh'''
-                    #test -f build/index.html
-                    echo $?
-                    npm test
-                '''
-            }
-        }
+        }*/
 
-        stage('E2E'){
-            agent{
-                docker {
-                    image 'mcr.microsoft.com/playwright:v1.39.0-jammy'
-                    reuseNode true
+        stage('Run Tests'){
+            parallel{
+                stage('Test'){
+                    agent{
+                        docker {
+                            image 'node:18-alpine'
+                            reuseNode true
+                        }
+                    }
+                    steps{
+                        echo "Test Stage"
+                        sh'''
+                            #test -f build/index.html
+                            echo $?
+                            npm test
+                        '''
+                    }
                 }
-            }
-            steps{
-                echo "Test Stage"
-                sh'''
-                    npm install serve
-                    node_modules/.bin/serve -s build &
-                    sleep 10
-                    npx playwright test --reporter=html
-                '''
+                stage('E2E'){
+                    agent{
+                        docker {
+                            image 'mcr.microsoft.com/playwright:v1.39.0-jammy'
+                            reuseNode true
+                        }
+                    }
+                    steps{
+                        echo "Test Stage"
+                        sh'''
+                            npm install serve
+                            node_modules/.bin/serve -s build &
+                            sleep 10
+                            npx playwright test --reporter=html
+                        '''
+                    }
+                }
             }
         }
     }
@@ -59,9 +63,8 @@ pipeline {
     post{
         always{
             junit 'jest-results/junit.xml'
+            /* groovylint-disable-next-line LineLength */
             publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, icon: '', keepAll: false, reportDir: 'playwright-report', reportFiles: 'index.html', reportName: 'Playwright HTML Report', reportTitles: '', useWrapperFileDirectly: true])
         }
     }
-
-
 }
