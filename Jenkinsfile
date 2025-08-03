@@ -20,22 +20,22 @@ pipeline {
                 '''
             }
         }
-        // stage('Test'){
-        //     agent{
-        //         docker {
-        //             image 'node:18-alpine'
-        //             reuseNode true
-        //         }
-        //     }
-        //     steps{
-        //         echo "Test Stage"
-        //         sh'''
-        //             #test -f build/index.html
-        //             echo $?
-        //             npm test
-        //         '''
-        //     }
-        // }
+        stage('Test'){
+            agent{
+                docker {
+                    image 'node:18-alpine'
+                    reuseNode true
+                }
+            }
+            steps{
+                echo "Test Stage"
+                sh'''
+                    #test -f build/index.html
+                    echo $?
+                    npm test
+                '''
+            }
+        }
 
         stage('E2E'){
             agent{
@@ -58,7 +58,7 @@ pipeline {
 
     post{
         always{
-            junit 'test-results/junit.xml'
+            junit 'jest-results/junit.xml'
         }
     }
 
