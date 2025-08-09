@@ -21,9 +21,9 @@ pipeline {
             }
         }*/
 
-        stage('Run Tests'){
+        stage('Tests'){
             parallel{
-                stage('Test'){
+                stage('Unit Tests'){
                     agent{
                         docker {
                             image 'node:18-alpine'
@@ -37,6 +37,11 @@ pipeline {
                             echo $?
                             npm test
                         '''
+                    }
+                    post{
+                        always{
+                            junit 'jest-results/junit.xml'
+                        }
                     }
                 }
                 stage('E2E'){
@@ -55,16 +60,18 @@ pipeline {
                             npx playwright test --reporter=html
                         '''
                     }
+                    post{
+                        always{
+                            publishHTML([allowMissing: false, 
+                                        alwaysLinkToLastBuild: false, 
+                                        keepAll: false,
+                                        reportDir: 'target/site',
+                                        reportFiles: 'index.html',
+                                        reportName: 'Test Report'])
+                        }
+                    }
                 }
             }
-        }
-    }
-
-    post{
-        always{
-            junit 'jest-results/junit.xml'
-            /* groovylint-disable-next-line LineLength */
-            publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, icon: '', keepAll: false, reportDir: 'playwright-report', reportFiles: 'index.html', reportName: 'Playwright HTML Report', reportTitles: '', useWrapperFileDirectly: true])
         }
     }
 }
