@@ -24,7 +24,7 @@ pipeline {
                     ls -la
                 '''
             }
-        }*\
+        }*/
 
         stage('Tests'){
             parallel{
